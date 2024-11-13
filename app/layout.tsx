@@ -1,9 +1,9 @@
-import HeaderAuth from "@/components/header-auth";
-import { ThemeSwitcher } from "@/components/theme-switcher";
 import { GeistSans } from "geist/font/sans";
+// import { GeistMono } from "geist/font/mono"; ${GeistMono.className}
 import { ThemeProvider } from "next-themes";
-import Link from "next/link";
 import "./globals.css";
+import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
+import { AppSidebar } from "@/components/app-sidebar";
 
 const defaultUrl = process.env.SERVER_URL
     ? `https://${process.env.SERVER_URL}`
@@ -23,7 +23,7 @@ export default function RootLayout({
     return (
         <html
             lang="en"
-            className={GeistSans.className}
+            className={`${GeistSans.className}`}
             suppressHydrationWarning
         >
             <body className="bg-background text-foreground">
@@ -33,7 +33,11 @@ export default function RootLayout({
                     enableSystem
                     disableTransitionOnChange
                 >
-                    <main className="min-h-screen flex flex-col items-center">
+                    <SidebarProvider>
+                        <AppSidebar />
+                        <SidebarInset>{children}</SidebarInset>
+                    </SidebarProvider>
+                    {/* <main className="min-h-screen flex flex-col items-center">
                         <div className="flex-1 w-full flex flex-col gap-20 items-center">
                             <nav className="w-full flex justify-center border-b border-b-foreground/10 h-16">
                                 <div className="w-full max-w-5xl flex justify-between items-center p-3 px-5 text-sm">
@@ -64,7 +68,7 @@ export default function RootLayout({
                                 <ThemeSwitcher />
                             </footer>
                         </div>
-                    </main>
+                    </main> */}
                 </ThemeProvider>
             </body>
         </html>

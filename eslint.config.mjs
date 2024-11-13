@@ -25,7 +25,6 @@ export default [
             "react-hooks": pluginReactHooks
         },
         rules: {
-            indent: ["error", 4], // Set ESLint to enforce 4 spaces for indentation
             "react/react-in-jsx-scope": "off",
             "react/prop-types": "off",
             ...pluginReactHooks.configs.recommended.rules
