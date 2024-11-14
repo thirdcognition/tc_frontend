@@ -2,7 +2,7 @@ import AppPageContainer from "@/components/app-page-container";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
-import { Label } from "@radix-ui/react-dropdown-menu";
+import { Label } from "@/components/ui/label";
 
 export default async function Index() {
     return (
