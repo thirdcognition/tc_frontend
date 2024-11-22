@@ -32,6 +32,12 @@ export default [
         }
     },
     {
-        ignores: [".config/*", "node_modules/*", ".next/*"]
+        ignores: [
+            ".config/*",
+            "node_modules/*",
+            ".next/*",
+            "lib_js/*",
+            "tc_compute_api/*"
+        ]
     }
 ];

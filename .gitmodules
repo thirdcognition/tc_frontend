@@ -1,0 +1,3 @@
+[submodule "tc_compute_api"]
+	path = tc_compute_api
+	url = https://github.com/thirdcognition/tc_compute_api

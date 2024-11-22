@@ -1,0 +1,13 @@
+{
+    "eslint.workingDirectories": [
+        {
+            "directory": "lib_ts"
+        }
+    ],
+    "eslint.useFlatConfig": true,
+    "prettier.configPath": ".prettierrc",
+    "prettier.printWidth": 120,
+    "prettier.tabWidth": 4,
+    "prettier.trailingComma": "none",
+    "vs-code-prettier-eslint.prettierLast": true,
+}
