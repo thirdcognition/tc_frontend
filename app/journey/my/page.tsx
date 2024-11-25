@@ -2,17 +2,21 @@ import AppPageContainer from "@/components/app-page-container";
 import { createClient } from "@/lib/utils/supabase/server";
 import { InfoIcon } from "lucide-react";
 import { redirect } from "next/navigation";
+import { User as UserModel } from "@/lib_js/models/user.js";
 
 export default async function MyJourneysPage() {
     const supabase = await createClient();
 
     const {
-        data: { user }
+        data: { user: supaUser }
     } = await supabase.auth.getUser();
 
-    if (!user) {
+    if (!supaUser) {
         return redirect("/sign-in");
     }
+
+    const userModel = new UserModel(supabase, supaUser.id);
+    await userModel.initialize();
 
     return (
         <AppPageContainer
@@ -35,7 +39,7 @@ export default async function MyJourneysPage() {
                         Your user details
                     </h2>
                     <pre className="text-xs font-mono p-3 rounded border max-h-32 overflow-auto">
-                        {JSON.stringify(user, null, 2)}
+                        {JSON.stringify(userModel, null, 2)}
                     </pre>
                 </div>
             </div>
