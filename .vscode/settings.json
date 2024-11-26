@@ -10,4 +10,17 @@
     "prettier.tabWidth": 4,
     "prettier.trailingComma": "none",
     "vs-code-prettier-eslint.prettierLast": true,
+    "editor.tabSize": 4,
+    "[typescript]": {
+        "editor.tabSize": 4
+    },
+    "[typescriptreact]": {
+        "editor.tabSize": 4
+    },
+    "[javascript]": {
+        "editor.tabSize": 4
+    },
+    "[javascriptreact]": {
+        "editor.tabSize": 4
+    }
 }

@@ -1,22 +1,25 @@
 import AppPageContainer from "@/components/app-page-container";
-import { createClient } from "@/lib/utils/supabase/server";
+// import { createClient } from "@/lib/utils/supabase/server";
 import { InfoIcon } from "lucide-react";
 import { redirect } from "next/navigation";
-import { User as UserModel } from "@/lib_js/models/user.js";
+// import { User as UserModel } from "@/lib_js/models/user.js";
+import getSession from "@/lib/utils/session/getServerSession.js";
 
 export default async function MyJourneysPage() {
-    const supabase = await createClient();
+    // const supabase = await createClient();
 
-    const {
-        data: { user: supaUser }
-    } = await supabase.auth.getUser();
+    // const {
+    //     data: { user: supaUser }
+    // } = await supabase.auth.getUser();
 
-    if (!supaUser) {
+    const session = await getSession();
+
+    if (!session.supaUser) {
         return redirect("/sign-in");
     }
 
-    const userModel = new UserModel(supabase, supaUser.id);
-    await userModel.initialize();
+    const userModel = session.userModel; //new UserModel(supabase, supaUser.id);
+    // await userModel.initialize();
 
     return (
         <AppPageContainer
@@ -38,7 +41,7 @@ export default async function MyJourneysPage() {
                     <h2 className="font-bold text-2xl mb-4">
                         Your user details
                     </h2>
-                    <pre className="text-xs font-mono p-3 rounded border max-h-32 overflow-auto">
+                    <pre className="text-xs font-mono p-3 rounded border overflow-auto">
                         {JSON.stringify(userModel, null, 2)}
                     </pre>
                 </div>
