@@ -9,15 +9,18 @@ import { User } from "lucide-react";
 // import { User as SupabaseUser } from "@supabase/supabase-js";
 import getSession from "@/lib/utils/session/getClientSession";
 import { User as UserModel } from "@/lib_js/models/UserInterfaces";
+import UserSession from "@/lib/utils/session/userSession";
 
 export function ProfileMenu() {
+    const [session, setSession] = useState<UserSession | null>(null);
     const [user, setUser] = useState<UserModel | null>(null);
     // const [loading, setLoading] = useState(true);
     useEffect(() => {
         (async () => {
-            const session = await getSession();
-            setUser(session.userModel);
-            console.log(session.userModel);
+            const userSession = await getSession();
+            setSession(userSession);
+            setUser(userSession.userModel);
+            console.log(userSession.userModel);
             // setLoading(false);
         })();
     });
@@ -32,7 +35,7 @@ export function ProfileMenu() {
                             className="flex items-left gap-3 p-2"
                         >
                             <Avatar>
-                                {user.profile.profilePicture ? (
+                                {user.profile.profilePicture && session ? (
                                     <AvatarImage
                                         src={user.profile.profilePicture}
                                     />

@@ -9,26 +9,28 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { User as UserData } from "@/lib_js/models/UserInterfaces";
-import { createClient } from "@/lib/utils/supabase/client";
+import UserSession from "@/lib/utils/session/userSession";
 
 export default function MyJourneysPage() {
+    const [session, setSession] = useState<UserSession | null>(null);
     const [userData, setUserData] = useState<UserData | null>(null);
     const [imageFile, setImageFile] = useState<File | null>(null);
 
     useEffect(() => {
         const fetchData = async () => {
-            const session = await getSession();
+            const newSession = await getSession();
+            setSession(newSession);
 
-            if (!session.supaUser) {
+            if (!newSession?.supaUser) {
                 return redirect("/sign-in");
             }
 
-            const userModel = session.userModel;
+            const userModel = newSession.userModel;
             setUserData(userModel); // Assuming userModel is an instance of UserData
         };
 
         fetchData();
-    }, []);
+    }, [session]);
 
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         if (e.target.files && e.target.files[0]) {
@@ -38,7 +40,7 @@ export default function MyJourneysPage() {
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        if (userData && userData.model) {
+        if (session && userData && userData.model) {
             const formData = new FormData(e.target as HTMLFormElement);
             const name = formData.get("name") as string;
 
@@ -47,9 +49,8 @@ export default function MyJourneysPage() {
             }
 
             if (imageFile) {
-                const supabase = createClient();
-                const { error } = await supabase.storage
-                    .from("profile-pictures")
+                const { data, error } = await session.supabase.storage
+                    .from("test")
                     .upload(`public/${imageFile.name}`, imageFile);
 
                 if (error) {
@@ -57,9 +58,9 @@ export default function MyJourneysPage() {
                     return;
                 }
 
-                const imageUrl = supabase.storage
-                    .from("profile-pictures")
-                    .getPublicUrl(`public/${imageFile.name}`).data.publicUrl;
+                const imageUrl = session.supabase.storage
+                    .from("test")
+                    .getPublicUrl(data.path).data.publicUrl;
 
                 userData.profile.profilePicture = imageUrl;
             }
@@ -97,6 +98,13 @@ export default function MyJourneysPage() {
                             <Label htmlFor="profilePicture">
                                 Profile Picture
                             </Label>
+                            {userData?.profile?.profilePicture && session && (
+                                <img
+                                    src={userData.profile.profilePicture}
+                                    alt="Profile Picture"
+                                    className="w-32 h-32 object-cover rounded-full"
+                                />
+                            )}
                             <Input
                                 id="profilePicture"
                                 type="file"
