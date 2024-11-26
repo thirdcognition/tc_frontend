@@ -18,14 +18,14 @@ export default async function MyJourneysPage() {
         return redirect("/sign-in");
     }
 
-    const userModel = session.userModel; //new UserModel(supabase, supaUser.id);
+    // const userModel = session.userModel; //new UserModel(supabase, supaUser.id);
     // await userModel.initialize();
 
     return (
         <AppPageContainer
             headerContent={
                 <h1 className="text-2xl font-semibold text-primary">
-                    Protected page
+                    My journeys
                 </h1>
             }
         >
@@ -33,17 +33,8 @@ export default async function MyJourneysPage() {
                 <div className="w-full">
                     <div className="bg-accent text-sm p-3 px-5 rounded-md text-foreground flex gap-3 items-center">
                         <InfoIcon size="16" strokeWidth={2} />
-                        This is a protected page that you can only see as an
-                        authenticated user
+                        This is where journeys will be listed.
                     </div>
-                </div>
-                <div className="flex flex-col gap-2 items-start">
-                    <h2 className="font-bold text-2xl mb-4">
-                        Your user details
-                    </h2>
-                    <pre className="text-xs font-mono p-3 rounded border overflow-auto">
-                        {JSON.stringify(userModel, null, 2)}
-                    </pre>
                 </div>
             </div>
         </AppPageContainer>
