@@ -1,6 +1,6 @@
 "use client";
 
-import * as React from "react";
+import { useState, useEffect } from "react";
 import {
     SidebarHeader,
     SidebarMenu,
@@ -19,18 +19,38 @@ import { Organizations } from "@/lib_js/models/supabase/organizationInterfaces";
 import { AvatarImage } from "@radix-ui/react-avatar";
 
 export function LoggedInSidebar() {
-    // const [user, setUser] = React.useState<UserModel | null>(null);
-    const [organization, setOrganization] =
-        React.useState<Organizations | null>(null);
-    React.useEffect(() => {
+    // const [user, setUser] = useState<UserModel | null>(null);
+    // const [organization, setOrganization] = useState<Organizations | null>(
+    //     null
+    // );
+    const [organizationPicture, setOrganizationPicture] = useState<
+        string | null
+    >(null);
+    const [organizationName, setOrganizationName] = useState<string | null>(
+        null
+    );
+
+    const handleOrganizationChanges = (model: Organizations) => {
+        console.log("organization changes", model);
+        if (model.logo) {
+            setOrganizationPicture(model.logo);
+        }
+        if (model.name) {
+            setOrganizationName(model.name);
+        }
+    };
+
+    useEffect(() => {
         (async () => {
             const session = await getSession();
-            // setUser(session.userModel);
-            setOrganization(
-                (await session.userModel.organization) as Organizations
-            );
-            console.log(session.userModel);
-            console.log(organization);
+            await session.userModel.getOrganization();
+
+            session.userModel.organization.listen(handleOrganizationChanges);
+            handleOrganizationChanges(session.userModel.organization);
+
+            // setOrganization(
+            //     (await session.userModel.getOrganization()) as Organizations
+            // );
             // setLoading(false);
         })();
     });
@@ -42,16 +62,16 @@ export function LoggedInSidebar() {
                     <SidebarMenuItem>
                         <SidebarMenuButton size="lg" tooltip="Dashboard">
                             <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground">
-                                {organization && organization.logo ? (
-                                    <AvatarImage src={organization.logo} />
+                                {organizationPicture ? (
+                                    <AvatarImage src={organizationPicture} />
                                 ) : (
                                     <Building2 className="size-4" />
                                 )}
                             </div>
-                            {organization && organization.name ? (
+                            {organizationName ? (
                                 <div className="flex flex-col gap-0.5">
                                     <span className="font-semibold">
-                                        {organization.name}
+                                        {organizationName}
                                     </span>
                                     <span className="text-xs">
                                         Welcome Back!
