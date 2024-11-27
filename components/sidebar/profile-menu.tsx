@@ -8,19 +8,35 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { User } from "lucide-react";
 // import { User as SupabaseUser } from "@supabase/supabase-js";
 import getSession from "@/lib/utils/session/getClientSession";
-import { User as UserModel } from "@/lib_js/models/UserInterfaces";
-import UserSession from "@/lib/utils/session/userSession";
+import { User as UserData } from "@/lib_js/models/UserInterfaces";
+// import UserSession from "@/lib/utils/session/userSession";
 
 export function ProfileMenu() {
-    const [session, setSession] = useState<UserSession | null>(null);
-    const [user, setUser] = useState<UserModel | null>(null);
+    // const [session, setSession] = useState<UserSession | null>(null);
+    const [userData, setUserData] = useState<UserData | null>(null);
+    const [profilePicture, setProfilePicture] = useState<string | null>(null);
+    const [profileName, setProfileName] = useState<string | null>(null);
+
+    const handleProfileChanges = (model: UserData) => {
+        if (model.profile?.profilePicture) {
+            setProfilePicture(model.profile.profilePicture);
+        }
+        if (model.profile?.name) {
+            setProfileName(model.profile.name);
+        }
+    };
+
     // const [loading, setLoading] = useState(true);
     useEffect(() => {
         (async () => {
-            const userSession = await getSession();
-            setSession(userSession);
-            setUser(userSession.userModel);
-            console.log(userSession.userModel);
+            const newSession = await getSession();
+            // setSession(newSession);
+            if (newSession?.userModel) {
+                setUserData(newSession.userModel);
+                newSession.userModel.listen(handleProfileChanges);
+                handleProfileChanges(newSession.userModel);
+            }
+
             // setLoading(false);
         })();
     });
@@ -28,17 +44,18 @@ export function ProfileMenu() {
     return (
         <SidebarMenu>
             <SidebarMenuItem>
-                {user ? (
-                    <SidebarMenuButton asChild tooltip={user.profile.email}>
+                {userData ? (
+                    <SidebarMenuButton
+                        asChild
+                        tooltip={userData?.profile?.email}
+                    >
                         <a
                             href="/profile/edit"
                             className="flex items-left gap-3 p-2"
                         >
                             <Avatar>
-                                {user.profile.profilePicture && session ? (
-                                    <AvatarImage
-                                        src={user.profile.profilePicture}
-                                    />
+                                {profilePicture ? (
+                                    <AvatarImage src={profilePicture} />
                                 ) : (
                                     <AvatarFallback>
                                         <User />
@@ -46,13 +63,13 @@ export function ProfileMenu() {
                                 )}
                             </Avatar>
                             <div className="flex flex-col">
-                                {user.profile.name ? (
+                                {profileName ? (
                                     <span className="text-sm font-medium">
-                                        {user.profile.name}
+                                        {profileName}
                                     </span>
                                 ) : (
                                     <span className="text-xs text-muted-foreground">
-                                        {user.profile.email}
+                                        {userData?.profile?.email}
                                     </span>
                                 )}
                             </div>

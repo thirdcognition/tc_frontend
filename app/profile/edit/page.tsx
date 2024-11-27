@@ -1,5 +1,5 @@
 "use client";
-
+import md5 from "crypto-js/md5";
 import AppPageContainer from "@/components/app-page-container";
 import { redirect } from "next/navigation";
 import getSession from "@/lib/utils/session/getClientSession.js";
@@ -15,6 +15,18 @@ export default function MyJourneysPage() {
     const [session, setSession] = useState<UserSession | null>(null);
     const [userData, setUserData] = useState<UserData | null>(null);
     const [imageFile, setImageFile] = useState<File | null>(null);
+    const [profilePicture, setProfilePicture] = useState<string | null>(null);
+    const [profileName, setProfileName] = useState<string | null>(null);
+
+    const handleProfileChanges = (model: UserData) => {
+        console.log("Profile changes", model);
+        if (model.profile?.profilePicture) {
+            setProfilePicture(model.profile.profilePicture);
+        }
+        if (model.profile?.name) {
+            setProfileName(model.profile.name);
+        }
+    };
 
     useEffect(() => {
         const fetchData = async () => {
@@ -27,10 +39,12 @@ export default function MyJourneysPage() {
 
             const userModel = newSession.userModel;
             setUserData(userModel); // Assuming userModel is an instance of UserData
+            userModel.listen(handleProfileChanges);
+            handleProfileChanges(userModel);
         };
 
         fetchData();
-    }, [session]);
+    });
 
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         if (e.target.files && e.target.files[0]) {
@@ -50,8 +64,14 @@ export default function MyJourneysPage() {
 
             if (imageFile) {
                 const { data, error } = await session.supabase.storage
-                    .from("test")
-                    .upload(`public/${imageFile.name}`, imageFile);
+                    .from("avatars")
+                    .upload(
+                        `profile_pictures/${md5(userData.authId + imageFile.name)}`,
+                        imageFile,
+                        {
+                            upsert: true
+                        }
+                    );
 
                 if (error) {
                     console.error("Error uploading image:", error);
@@ -59,10 +79,11 @@ export default function MyJourneysPage() {
                 }
 
                 const imageUrl = session.supabase.storage
-                    .from("test")
+                    .from("avatars")
                     .getPublicUrl(data.path).data.publicUrl;
 
                 userData.profile.profilePicture = imageUrl;
+                userData.profile.notifyListeners();
             }
 
             console.log(userData);
@@ -90,7 +111,7 @@ export default function MyJourneysPage() {
                             <Input
                                 id="name"
                                 name="name"
-                                defaultValue={userData?.profile?.name || ""}
+                                defaultValue={profileName || ""}
                                 placeholder="Name"
                             />
                         </div>
@@ -98,9 +119,9 @@ export default function MyJourneysPage() {
                             <Label htmlFor="profilePicture">
                                 Profile Picture
                             </Label>
-                            {userData?.profile?.profilePicture && session && (
+                            {profilePicture && (
                                 <img
-                                    src={userData.profile.profilePicture}
+                                    src={profilePicture}
                                     alt="Profile Picture"
                                     className="w-32 h-32 object-cover rounded-full"
                                 />
